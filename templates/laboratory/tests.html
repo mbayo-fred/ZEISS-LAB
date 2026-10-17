@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Laboratory Tests</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Laboratory Test Catalog</h2>
+      <a href="/admin/laboratory/labtest/add/" class="btn btn-success">+ Add New Test</a>
+    </div>
+    
+    <div class="card shadow-sm">
+      <table class="table table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Code</th>
+            <th>Test Name</th>
+            <th>Category</th>
+            <th>Sample</th>
+            <th>Price (UGX)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for test in tests %}
+          <tr>
+            <td><strong>{{ test.code }}</strong></td>
+            <td>{{ test.name }}</td>
+            <td>{{ test.category.name }}</td>
+            <td>{{ test.sample_type }}</td>
+            <td>{{ test.price }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center py-4">No tests available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <br>
+    <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+  </div>
+</body>
+</html>

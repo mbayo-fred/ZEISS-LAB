@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Revenue</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-4">
+  <div class="container">
+    <h2>Revenue for Today</h2>
+    <div class="alert alert-success mt-4">
+      <h3>Total Revenue: {{ total }} UGX</h3>
+    </div>
+
+    <div class="card mt-4">
+      <table class="table mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Order #</th>
+            <th>Patient</th>
+            <th>Time</th>
+            <th>Total (UGX)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td>{{ order.order_number }}</td>
+            <td>{{ order.patient.full_name }}</td>
+            <td>{{ order.created_at|time:"H:i" }}</td>
+            <td>
+                <!-- In a real app, you'd calculate this in the view, but this works for now -->
+                {% for item in order.orderitem_set.all %}
+                    {{ item.price }}
+                {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

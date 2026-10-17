@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Tests - {{ patient.full_name }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-4">
+  <div class="container" style="max-width: 800px;">
+    <h2>Order Tests for: {{ patient.full_name }} ({{ patient.patient_id }})</h2>
+    <hr>
+    
+    <form method="post" class="card p-4 shadow-sm">
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label class="form-label">Priority</label>
+        {{ form.priority }}
+      </div>
+
+      <h5 class="mt-4">Select Tests (Dropdown/Checkboxes)</h5>
+      <div class="border p-3 rounded mb-4" style="max-height: 300px; overflow-y: auto;">
+        {% for checkbox in form.tests %}
+          <div class="form-check mb-2">
+            {{ checkbox.tag }}
+            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+              {{ checkbox.choice_label }} 
+              <!-- We add a data attribute for the price so JavaScript can calculate it -->
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="alert alert-success fs-5">
+        <strong>Total Amount:</strong> <span id="total_price">0.00</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg">Save Order & Print Invoice</button>
+      <a href="{% url 'patients:list' %}" class="btn btn-secondary btn-lg">Cancel</a>
+    </form>
+  </div>
+
+  <script>
+    // This script calculates the total price based on selected tests
+    const checkboxes = document.querySelectorAll('input[name="tests"]');
+    const totalDisplay = document.getElementById('total_price');
+    
+    // We need the prices of the tests. We'll inject them into JavaScript.
+    const testPrices = {
+        {% for test in form.fields.tests.queryset %}
+            "{{ test.id }}": {{ test.price }},
+        {% endfor %}
+    };
+
+    function calculateTotal() {
+        let total = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                total += testPrices[cb.value] || 0;
+            }
+        });
+        totalDisplay.textContent = total.toFixed(2);
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
+    calculateTotal(); // Run on load
+  </script>
+</body>
+</html>

@@ -161,8 +161,14 @@ REST_FRAMEWORK = {
 # --------------------------------------------------------------------------
 # Email (console backend for development)
 # --------------------------------------------------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'Zeiss Medical Diagnostic Laboratories <noreply@zeisslab.local>'
+# Email Configuration (Gmail)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mbayofred37@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'xxxx xxxx xxxx xxxx'  # Your 16-letter Google App Password
+DEFAULT_FROM_EMAIL = 'Zeiss Medical Diagnostic Laboratories <mbayofred37@gmail.com>'
 
 
 # --------------------------------------------------------------------------

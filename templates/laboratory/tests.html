@@ -7,8 +7,10 @@
 <body class="bg-light p-4">
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Laboratory Test Catalog</h2>
-      <a href="/admin/laboratory/labtest/add/" class="btn btn-success">+ Add New Test</a>
+      <h2 class="font-weight-bold">Laboratory Test Catalog</h2>
+      <button type="button" class="btn btn-success btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#testModal">
+        + Add New Test
+      </button>
     </div>
     
     <div class="card shadow-sm">
@@ -20,6 +22,7 @@
             <th>Category</th>
             <th>Sample</th>
             <th>Price (UGX)</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -30,9 +33,13 @@
             <td>{{ test.category.name }}</td>
             <td>{{ test.sample_type }}</td>
             <td>{{ test.price }}</td>
+            <td>
+              <!-- Edit Button -->
+              <a href="?edit_id={{ test.id }}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
           </tr>
           {% empty %}
-          <tr><td colspan="5" class="text-center py-4">No tests available.</td></tr>
+          <tr><td colspan="6" class="text-center py-4">No tests available.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -40,5 +47,82 @@
     <br>
     <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
   </div>
+
+  <!-- TEST MODAL (Dialogue Box) -->
+  <div class="modal fade" id="testModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="edit_id" value="{{ test_to_edit.id|default:'' }}">
+          
+          <div class="modal-header {% if test_to_edit %}bg-warning{% else %}bg-success{% endif %} text-white">
+            <h5 class="modal-title">
+                {% if test_to_edit %} Edit Test: {{ test_to_edit.code }} {% else %} Add New Test {% endif %}
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="row">
+              <!-- Left Column -->
+              <div class="col-md-6 border-end">
+                <h6 class="mb-3 text-success">Test Details</h6>
+                <div class="mb-3">
+                  <label class="form-label">Test Code</label>
+                  {{ form.code }}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Test Name</label>
+                  {{ form.name }}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Category</label>
+                  {{ form.category }}
+                </div>
+              </div>
+              
+              <!-- Right Column -->
+              <div class="col-md-6">
+                <h6 class="mb-3 text-success">Sample & Pricing</h6>
+                <div class="mb-3">
+                  <label class="form-label">Sample Type</label>
+                  {{ form.sample_type }}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Price (UGX)</label>
+                  {{ form.price }}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Default Reference Range</label>
+                  {{ form.reference_range }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn {% if test_to_edit %}btn-warning{% else %}btn-success{% endif %}">
+                {% if test_to_edit %} Save Changes {% else %} Add Test {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Automatically open the modal if we are in Edit mode (url has ?edit_id=)
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('edit_id')) {
+            var myModal = new bootstrap.Modal(document.getElementById('testModal'));
+            myModal.show();
+        }
+    });
+  </script>
 </body>
 </html>

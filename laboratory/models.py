@@ -45,6 +45,12 @@ class TestOrder(models.Model):
         URGENT = 'URGENT', 'Urgent'
         STAT = 'STAT', 'STAT'
 
+    class PaymentMethod(models.TextChoices):
+        CASH = 'CASH', 'Cash'
+        MOBILE = 'MOBILE', 'Mobile Money'
+        INSURANCE = 'INSURANCE', 'Insurance'
+        CARD = 'CARD', 'Credit/Debit Card'
+
     order_number = models.CharField(max_length=20, unique=True, editable=False, blank=True)
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT, related_name='orders')
     ordered_by = models.ForeignKey(
@@ -53,6 +59,7 @@ class TestOrder(models.Model):
     tests = models.ManyToManyField(LabTest, through='OrderItem', related_name='orders')
     status = models.CharField(max_length=15, choices=Status.choices, default=Status.PENDING)
     priority = models.CharField(max_length=10, choices=Priority.choices, default=Priority.ROUTINE)
+    payment_method = models.CharField(max_length=15, choices=PaymentMethod.choices, default=PaymentMethod.CASH)
     clinical_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

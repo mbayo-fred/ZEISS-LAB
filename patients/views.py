@@ -8,7 +8,7 @@ from laboratory.models import TestOrder, OrderItem, TestResult
 def patient_list(request):
     patients = Patient.objects.all().order_by('-created_at')
     edit_id = request.GET.get('edit_id')
-    
+
     if edit_id:
         patient = get_object_or_404(Patient, id=edit_id)
         form = PatientRegistrationForm(instance=patient)
@@ -31,39 +31,46 @@ def patient_list(request):
             if not edit_id_post:
                 patient.created_by = request.user
             patient.save()
-            
+
             # 2. Handle Tests & Results
             selected_tests = form.cleaned_data['tests']
-            
+
             if selected_tests:
                 existing_order = TestOrder.objects.filter(patient=patient).order_by('-created_at').first()
-                
+
                 if not existing_order:
                     existing_order = TestOrder.objects.create(
                         patient=patient,
                         ordered_by=request.user,
-                        priority='ROUTINE'
+                        priority='ROUTINE',
+                        # Save the payment method from the form dropdown
+                        payment_method=form.cleaned_data.get('payment_method', 'CASH')
                     )
-                
+                else:
+                    # If they are editing an existing order, update the payment method
+                    if form.cleaned_data.get('payment_method'):
+                        existing_order.payment_method = form.cleaned_data.get('payment_method')
+                        existing_order.save()
+
                 for test in selected_tests:
                     existing_item = OrderItem.objects.filter(order=existing_order, test=test).first()
-                    
+
                     if not existing_item:
                         item = OrderItem.objects.create(
-                            order=existing_order, 
-                            test=test, 
+                            order=existing_order,
+                            test=test,
                             price=test.price
                         )
                     else:
                         item = existing_item
-                    
+
                     # Get Result Value and Custom Reference Range
                     result_key = f'result_{test.id}'
                     ref_range_key = f'ref_range_{test.id}'
-                    
+
                     result_value = request.POST.get(result_key)
                     custom_ref_range = request.POST.get(ref_range_key)
-                    
+
                     if result_value:
                         TestResult.objects.update_or_create(
                             order_item=item,
@@ -74,8 +81,8 @@ def patient_list(request):
                                 'is_abnormal': False
                             }
                         )
-            
-            return redirect('patients:list') 
+
+            return redirect('patients:list')
 
     return render(request, 'patients/list.html', {'patients': patients, 'form': form, 'patient': patient})
 
@@ -84,7 +91,7 @@ def patient_list(request):
 def patient_detail(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     orders = TestOrder.objects.filter(patient=patient).order_by('-created_at')
-    
+
     return render(request, 'patients/detail.html', {
         'patient': patient,
         'orders': orders

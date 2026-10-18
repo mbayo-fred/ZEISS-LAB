@@ -8,9 +8,22 @@ class PatientRegistrationForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         required=False
     )
-    
+
     # We will use this field in the template to type in the result for each selected test
     test_result_value = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    
+    # NEW: Payment Method Dropdown
+    payment_method = forms.ChoiceField(
+        choices=[
+            ('CASH', 'Cash'),
+            ('MOBILE', 'Mobile Money'),
+            ('INSURANCE', 'Insurance'),
+            ('CARD', 'Credit/Debit Card')
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=True,
+        initial='CASH'
+    )
 
     class Meta:
         model = Patient

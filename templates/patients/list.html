@@ -6,8 +6,13 @@
 </head>
 <body class="bg-light p-4">
   <div class="container">
+    
+    <!-- TOP HEADER WITH BACK TO DASHBOARD -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Patient Registry</h2>
+      <div class="d-flex align-items-center gap-3">
+        <h2 class="mb-0">Patient Registry</h2>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+      </div>
       <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#patientModal">
         + Register New Patient
       </button>
@@ -119,7 +124,7 @@
                   <strong>Total Amount:</strong> <span id="total_price">0.00</span> UGX
                 </div>
 
-                <!-- ADDED: Payment Method Dropdown -->
+                <!-- Payment Method Dropdown -->
                 <div class="mt-3">
                     <label class="form-label fw-bold text-success">Payment Method</label>
                     {{ form.payment_method }}

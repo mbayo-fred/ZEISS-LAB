@@ -94,11 +94,13 @@ WSGI_APPLICATION = 'zeiss_medical_diagnostic_laboratory.wsgi.application'
 # --------------------------------------------------------------------------
 # Database
 # --------------------------------------------------------------------------
-# If DATABASE_URL exists (on Render), use it (Supabase). 
-# Otherwise, fallback to local SQLite for development.
+# This logic safely handles the SQLite path for local development (Windows/Mac) 
+# while allowing Render to use the Supabase DATABASE_URL environment variable.
+SQLITE_PATH = str(BASE_DIR).replace('\\', '/') + '/db.sqlite3'
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=f"sqlite:///{SQLITE_PATH}",
         conn_max_age=600
     )
 }

@@ -1,0 +1,342 @@
+[
+{
+    "model": "laboratory.testcategory",
+    "pk": 1,
+    "fields": {
+        "name": "Hematology",
+        "description": "Blood tests"
+    }
+},
+{
+    "model": "laboratory.testcategory",
+    "pk": 2,
+    "fields": {
+        "name": "Clinical Chemistry",
+        "description": "Chemical analysis of body fluids"
+    }
+},
+{
+    "model": "laboratory.testcategory",
+    "pk": 3,
+    "fields": {
+        "name": "Microbiology",
+        "description": "Cultures and infections"
+    }
+},
+{
+    "model": "laboratory.testcategory",
+    "pk": 4,
+    "fields": {
+        "name": "Serology",
+        "description": "Antibodies and antigens"
+    }
+}
+]
+[
+{
+    "model": "laboratory.labtest",
+    "pk": 1,
+    "fields": {
+        "code": "HEM01",
+        "name": "Complete Blood Count (CBC)",
+        "category": 1,
+        "price": "30.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "4.5 - 11.0",
+        "unit": "x10^9/L",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 2,
+    "fields": {
+        "code": "HEM02",
+        "name": "Hemoglobin (Hb)",
+        "category": 1,
+        "price": "10.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "13.5 - 17.5",
+        "unit": "g/dL",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 3,
+    "fields": {
+        "code": "HEM03",
+        "name": "Malaria Parasite (MP)",
+        "category": 1,
+        "price": "5.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "Negative",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 4,
+    "fields": {
+        "code": "CHM01",
+        "name": "Fasting Blood Sugar (FBS)",
+        "category": 2,
+        "price": "5000.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "11mmol/dl",
+        "unit": "mg/dL",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 5,
+    "fields": {
+        "code": "CHM02",
+        "name": "Liver Function Test (LFT)",
+        "category": 2,
+        "price": "45.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "Varies",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 6,
+    "fields": {
+        "code": "CHM03",
+        "name": "Kidney Function Test (KFT)",
+        "category": 2,
+        "price": "45.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "Varies",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 7,
+    "fields": {
+        "code": "MIC01",
+        "name": "Urinalysis",
+        "category": 3,
+        "price": "15.00",
+        "sample_type": "Urine",
+        "turnaround_hours": 24,
+        "reference_range": "Normal",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 8,
+    "fields": {
+        "code": "MIC02",
+        "name": "Stool Analysis",
+        "category": 3,
+        "price": "15.00",
+        "sample_type": "Stool",
+        "turnaround_hours": 24,
+        "reference_range": "Normal",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 9,
+    "fields": {
+        "code": "SER01",
+        "name": "HIV Rapid Test",
+        "category": 4,
+        "price": "10.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "Non-Reactive",
+        "unit": "",
+        "is_active": true,
+        "required_stock": [
+            3
+        ]
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 10,
+    "fields": {
+        "code": "SER02",
+        "name": "Hepatitis B Surface Antigen",
+        "category": 4,
+        "price": "20.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "Negative",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+},
+{
+    "model": "laboratory.labtest",
+    "pk": 11,
+    "fields": {
+        "code": "SER05",
+        "name": "H-Pylori",
+        "category": 4,
+        "price": "10000.00",
+        "sample_type": "Blood",
+        "turnaround_hours": 24,
+        "reference_range": "",
+        "unit": "",
+        "is_active": true,
+        "required_stock": []
+    }
+}
+]
+[
+{
+    "model": "inventory.supplier",
+    "pk": 1,
+    "fields": {
+        "name": "ABACUS PHARMA (LTD)",
+        "contact_person": "MUYINDI",
+        "phone": "0759025693",
+        "email": "abacus@info.com",
+        "address": "Baita"
+    }
+}
+]
+[
+{
+    "model": "inventory.invoice",
+    "pk": 1,
+    "fields": {
+        "invoice_number": "INV-0001",
+        "supplier": 1,
+        "date_received": "2026-10-20"
+    }
+}
+]
+[
+{
+    "model": "inventory.stockitem",
+    "pk": 1,
+    "fields": {
+        "name": "H-Pylori",
+        "category": "STRIP",
+        "supplier": null,
+        "invoice": 1,
+        "batch_number": "1234",
+        "expiry_date": "2028-11-30",
+        "quantity_in_stock": 60,
+        "reorder_level": 10,
+        "unit_price": "1000.00",
+        "last_updated": "2026-10-20T11:05:19.074Z"
+    }
+},
+{
+    "model": "inventory.stockitem",
+    "pk": 3,
+    "fields": {
+        "name": "HIV STRIPS",
+        "category": "STRIP",
+        "supplier": null,
+        "invoice": 1,
+        "batch_number": "12345",
+        "expiry_date": "2030-10-24",
+        "quantity_in_stock": 49,
+        "reorder_level": 10,
+        "unit_price": "2000.00",
+        "last_updated": "2026-10-20T10:38:44.783Z"
+    }
+}
+]
+[
+{
+    "model": "patients.patient",
+    "pk": 1,
+    "fields": {
+        "patient_id": "ZMD-0256519B",
+        "first_name": "John",
+        "last_name": "Doe",
+        "date_of_birth": "1990-01-01",
+        "gender": "M",
+        "phone": "0700000000",
+        "email": "",
+        "address": "",
+        "national_id": "",
+        "created_at": "2026-10-17T09:41:48.250Z",
+        "created_by": null
+    }
+},
+{
+    "model": "patients.patient",
+    "pk": 2,
+    "fields": {
+        "patient_id": "ZMD-835E0124",
+        "first_name": "Fred",
+        "last_name": "Mbayo",
+        "date_of_birth": "2016-12-01",
+        "gender": "M",
+        "phone": "0759025693",
+        "email": "mbayofred37@gmail.com",
+        "address": "lugonjo",
+        "national_id": "",
+        "created_at": "2026-10-17T11:37:16.411Z",
+        "created_by": 1
+    }
+},
+{
+    "model": "patients.patient",
+    "pk": 3,
+    "fields": {
+        "patient_id": "ZMD-89C1BF86",
+        "first_name": "KAMOGA",
+        "last_name": "ABASSI",
+        "date_of_birth": "2013-06-30",
+        "gender": "M",
+        "phone": "0762556915",
+        "email": "mbayofred37@gmail.com",
+        "address": "KIWAFU",
+        "national_id": "",
+        "created_at": "2026-10-17T12:35:58.929Z",
+        "created_by": 1
+    }
+},
+{
+    "model": "patients.patient",
+    "pk": 4,
+    "fields": {
+        "patient_id": "ZMD-DB80372A",
+        "first_name": "LULE",
+        "last_name": "IVAN",
+        "date_of_birth": "2020-06-30",
+        "gender": "M",
+        "phone": "0785678903",
+        "email": "",
+        "address": "KITOORO",
+        "national_id": "",
+        "created_at": "2026-10-20T10:38:44.658Z",
+        "created_by": 1
+    }
+}
+]

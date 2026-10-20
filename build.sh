@@ -10,4 +10,6 @@ python manage.py collectstatic --no-input
 
 # Apply database migrations
 python manage.py migrate
-python manage.py createsuperuser --no-input
+
+# Load your local data into Supabase
+python manage.py loaddata data.json

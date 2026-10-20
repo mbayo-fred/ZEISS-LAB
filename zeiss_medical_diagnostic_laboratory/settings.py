@@ -22,7 +22,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-_#l3=5eeor$)c2$*z_g8u
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Allow Render's URL and localhost
-ALLOWED_HOSTS = ['*'] # You can restrict this later to your specific Render URL
+ALLOWED_HOSTS = ['*']
 
 # CSRF Trusted Origins (Required for POST requests on Render)
 CSRF_TRUSTED_ORIGINS = [
@@ -94,16 +94,19 @@ WSGI_APPLICATION = 'zeiss_medical_diagnostic_laboratory.wsgi.application'
 # --------------------------------------------------------------------------
 # Database
 # --------------------------------------------------------------------------
-# This logic safely handles the SQLite path for local development (Windows/Mac) 
-# while allowing Render to use the Supabase DATABASE_URL environment variable.
-SQLITE_PATH = str(BASE_DIR).replace('\\', '/') + '/db.sqlite3'
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{SQLITE_PATH}",
-        conn_max_age=600
-    )
-}
+# If Render provides DATABASE_URL, use it (Supabase). 
+# Otherwise, fall back to local SQLite for development.
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # --------------------------------------------------------------------------
 # Authentication

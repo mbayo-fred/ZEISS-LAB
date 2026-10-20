@@ -5,10 +5,11 @@ from django.contrib.auth import login
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum
+from django.db.models import Sum, F  # Added F for the stock calculation
 
 from patients.models import Patient
 from laboratory.models import LabTest, TestOrder, OrderItem
+from inventory.models import StockItem  # Added inventory model
 from .forms import CustomUserCreationForm
 
 @login_required
@@ -24,17 +25,21 @@ def dashboard(request):
             orders = TestOrder.objects.filter(created_at__date__range=[start_date, end_date])
         else:
             orders = TestOrder.objects.filter(created_at__date=start_date)
-        
+
         total = OrderItem.objects.filter(order__in=orders).aggregate(total=Sum('price'))['total']
         return total or 0
 
     # Calculate Revenue
     rev_today = get_revenue(today)
     rev_yesterday = get_revenue(yesterday)
-    
+
     rev_week = OrderItem.objects.filter(order__created_at__date__gte=start_of_week).aggregate(total=Sum('price'))['total'] or 0
     rev_month = OrderItem.objects.filter(order__created_at__date__gte=start_of_month).aggregate(total=Sum('price'))['total'] or 0
     rev_year = OrderItem.objects.filter(order__created_at__date__gte=start_of_year).aggregate(total=Sum('price'))['total'] or 0
+
+    # Calculate Inventory Stats (Added)
+    stock_items = StockItem.objects.all().order_by('quantity_in_stock')
+    low_stock_alerts = stock_items.filter(quantity_in_stock__lte=F('reorder_level'))
 
     context = {
         'total_patients': Patient.objects.count(),
@@ -45,6 +50,9 @@ def dashboard(request):
         'rev_week': rev_week,
         'rev_month': rev_month,
         'rev_year': rev_year,
+        # Added these to the context
+        'stock_items': stock_items,
+        'low_stock_count': low_stock_alerts.count(),
     }
     return render(request, 'core/dashboard.html', context)
 
@@ -54,7 +62,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.role = 'RECEP' 
+            user.role = 'RECEP'
             user.save()
             login(request, user)
             messages.success(request, "Account created successfully!")

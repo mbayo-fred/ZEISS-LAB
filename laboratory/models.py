@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import User
 from patients.models import Patient
+from inventory.models import StockItem
 
 class TestCategory(models.Model):
     name = models.CharField(max_length=100)  # Hematology, Chemistry, Microbiology
@@ -24,6 +25,7 @@ class LabTest(models.Model):
     reference_range = models.CharField(max_length=200, blank=True)
     unit = models.CharField(max_length=30, blank=True)
     is_active = models.BooleanField(default=True)
+    required_stock = models.ManyToManyField(StockItem, blank=True, help_text="Select strips/reagents used for this test")
 
     class Meta:
         ordering = ['code']

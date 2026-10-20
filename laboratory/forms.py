@@ -21,7 +21,8 @@ class OrderForm(forms.ModelForm):
 class LabTestForm(forms.ModelForm):
     class Meta:
         model = LabTest
-        fields = ['code', 'name', 'category', 'sample_type', 'price', 'reference_range']
+        # ADDED 'required_stock' to the fields list
+        fields = ['code', 'name', 'category', 'sample_type', 'price', 'reference_range', 'required_stock']
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., HEM04'}),
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Blood Group'}),
@@ -29,4 +30,6 @@ class LabTestForm(forms.ModelForm):
             'sample_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Blood'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 15000'}),
             'reference_range': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 70-100 or Negative'}),
+            # ADDED the widget for the stock dropdown
+            'required_stock': forms.SelectMultiple(attrs={'class': 'form-select', 'size': '5'}),
         }

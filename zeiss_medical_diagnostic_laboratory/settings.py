@@ -3,6 +3,8 @@ Django settings for zeiss_medical_diagnostic_laboratory project.
 Zeiss Medical Diagnostic Laboratories — Laboratory Information System (LIS)
 """
 
+import os
+import dj_database_url
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -10,16 +12,24 @@ from pathlib import Path
 # --------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # --------------------------------------------------------------------------
 # Security
 # --------------------------------------------------------------------------
-SECRET_KEY = 'django-insecure-_#l3=5eeor$)c2$*z_g8u*@%j%)(e42!7@3mbhh3hb*pe2)d^w'
+# Use Render's Environment Variable for SECRET_KEY. Fallback for local dev.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-_#l3=5eeor$)c2$*z_g8u*@%j%)(e42!7@3mbhh3hb*pe2)d^w')
 
-DEBUG = True
+# Use Render's Environment Variable for DEBUG. Fallback is True for local dev.
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# Allow Render's URL and localhost
+ALLOWED_HOSTS = ['*'] # You can restrict this later to your specific Render URL
 
+# CSRF Trusted Origins (Required for POST requests on Render)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'http://localhost',
+    'http://127.0.0.1',
+]
 
 # --------------------------------------------------------------------------
 # Applications
@@ -42,14 +52,15 @@ INSTALLED_APPS = [
     'patients',
     'laboratory',
     'reports',
+    'inventory',
 ]
-
 
 # --------------------------------------------------------------------------
 # Middleware
 # --------------------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # ADDED FOR RENDER STATIC FILES
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,7 +70,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'zeiss_medical_diagnostic_laboratory.urls'
-
 
 # --------------------------------------------------------------------------
 # Templates
@@ -81,17 +91,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'zeiss_medical_diagnostic_laboratory.wsgi.application'
 
-
 # --------------------------------------------------------------------------
 # Database
 # --------------------------------------------------------------------------
+# If DATABASE_URL exists (on Render), use it (Supabase). 
+# Otherwise, fallback to local SQLite for development.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
 }
-
 
 # --------------------------------------------------------------------------
 # Authentication
@@ -109,7 +119,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
-
 # --------------------------------------------------------------------------
 # Internationalization
 # --------------------------------------------------------------------------
@@ -118,7 +127,6 @@ TIME_ZONE = 'Africa/Kampala'
 USE_I18N = True
 USE_TZ = True
 
-
 # --------------------------------------------------------------------------
 # Static & Media files
 # --------------------------------------------------------------------------
@@ -126,22 +134,22 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# ADDED FOR RENDER: Compresses static files for faster loading
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # --------------------------------------------------------------------------
 # Default primary key
 # --------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # --------------------------------------------------------------------------
-# Crispy forms (Bootstrap 5 via crispy_forms built-in pack)
+# Crispy forms
 # --------------------------------------------------------------------------
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
 
 # --------------------------------------------------------------------------
 # REST Framework
@@ -157,19 +165,17 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 25,
 }
 
-
 # --------------------------------------------------------------------------
-# Email (console backend for development)
+# Email (Gmail SMTP)
 # --------------------------------------------------------------------------
-# Email Configuration (Gmail)
+# Use Render's Environment Variables for Email Passwords
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mbayofred37@gmail.com'  # Your Gmail address
-EMAIL_HOST_PASSWORD = 'xxxx xxxx xxxx xxxx'  # Your 16-letter Google App Password
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'mbayofred37@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'xxxx xxxx xxxx xxxx') # App Password
 DEFAULT_FROM_EMAIL = 'Zeiss Medical Diagnostic Laboratories <mbayofred37@gmail.com>'
-
 
 # --------------------------------------------------------------------------
 # Zeiss LIS — custom project settings

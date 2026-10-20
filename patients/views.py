@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Patient
 from .forms import PatientRegistrationForm
 from laboratory.models import TestOrder, OrderItem, TestResult
+from inventory.models import StockUsage  # Import the stock usage model
 
 @login_required
 def patient_list(request):
@@ -43,11 +44,9 @@ def patient_list(request):
                         patient=patient,
                         ordered_by=request.user,
                         priority='ROUTINE',
-                        # Save the payment method from the form dropdown
                         payment_method=form.cleaned_data.get('payment_method', 'CASH')
                     )
                 else:
-                    # If they are editing an existing order, update the payment method
                     if form.cleaned_data.get('payment_method'):
                         existing_order.payment_method = form.cleaned_data.get('payment_method')
                         existing_order.save()
@@ -61,6 +60,22 @@ def patient_list(request):
                             test=test,
                             price=test.price
                         )
+                        
+                        # --- NEW: DEDUCT STOCK & LOG USAGE ---
+                        for stock in test.required_stock.all():
+                            if stock.quantity_in_stock > 0:
+                                stock.quantity_in_stock -= 1
+                                stock.save()
+                                
+                                # Create an audit log of this stock usage
+                                StockUsage.objects.create(
+                                    stock_item=stock,
+                                    used_by=request.user,
+                                    quantity_used=1,
+                                    reason=f"Used for {test.name} (Patient: {patient.full_name}, Order: {existing_order.order_number})"
+                                )
+                        # -------------------------------------
+
                     else:
                         item = existing_item
 
@@ -76,7 +91,7 @@ def patient_list(request):
                             order_item=item,
                             defaults={
                                 'value': result_value,
-                                'reference_range': custom_ref_range, # Save the edited range
+                                'reference_range': custom_ref_range,
                                 'performed_by': request.user,
                                 'is_abnormal': False
                             }

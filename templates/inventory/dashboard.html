@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inventory Dashboard - ZMDL</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark px-3 mb-4">
+  <span class="navbar-brand mb-0 h1">Zeiss Medical Diagnostic Laboratory</span>
+  <a href="/" class="btn btn-outline-light btn-sm">← Back to Main Dashboard</a>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 mb-4">
+      <div class="list-group shadow-sm">
+        <a href="{% url 'inventory_dashboard' %}" class="list-group-item list-group-item-action active">Inventory List</a>
+        <button class="list-group-item list-group-item-action text-start" data-bs-toggle="modal" data-bs-target="#supplierModal">+ Add Supplier</button>
+        <button class="list-group-item list-group-item-action text-start" data-bs-toggle="modal" data-bs-target="#invoiceModal">+ Add Invoice</button>
+        <a href="/admin/inventory/stockusage/" class="list-group-item list-group-item-action">Review Usage Logs</a>
+      </div>
+    </div>
+
+    <div class="col-md-10">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0 font-weight-bold">Inventory Items</h3>
+        <div>
+            <button class="btn btn-success shadow-sm me-2" data-bs-toggle="modal" data-bs-target="#newStockModal">+ New Item</button>
+            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#restockModal">📦 Restock Existing</button>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <table class="table table-hover mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Generic Name</th>
+              <th>Batch No.</th>
+              <th>Quantity</th>
+              <th>Expiry Date</th>
+              <th>Linked Tests</th>
+              <th>Supplier / Invoice</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in page_obj %}
+            <tr>
+              <td><strong>{{ item.name }}</strong></td>
+              <td>{{ item.batch_number|default:"-" }}</td>
+              <td>
+                {{ item.quantity_in_stock }}
+                {% if item.quantity_in_stock <= item.reorder_level %}
+                  <span class="badge bg-danger ms-2">Low</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if item.expiry_date %}{{ item.expiry_date|date:"M d, Y" }}{% else %}-{% endif %}
+              </td>
+              <td>
+                <!-- THIS LOOP SHOWS THE LINKED TESTS -->
+                {% for test in item.labtest_set.all %}
+                  <span class="badge bg-info text-dark mb-1">{{ test.name }}</span>
+                {% empty %}
+                  <span class="text-muted small">None</span>
+                {% endfor %}
+              </td>
+              <td>
+                {% if item.supplier %}{{ item.supplier.name }}{% endif %}
+                {% if item.invoice %}<br><small class="text-muted">Inv: {{ item.invoice.invoice_number }}</small>{% endif %}
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ item.id }}">Edit</button>
+                    <form method="post" onsubmit="return confirm('Are you sure you want to delete {{ item.name }}?');" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_item" value="1">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </div>
+
+                <!-- Edit Quantity Modal -->
+                <div class="modal fade" id="editModal{{ item.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-header bg-warning text-dark">
+                          <h5 class="modal-title">Edit Quantity: {{ item.name }}</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          <input type="hidden" name="edit_quantity" value="1">
+                          <input type="hidden" name="item_id" value="{{ item.id }}">
+                          <label class="form-label">New Quantity</label>
+                          <input type="number" name="new_quantity" class="form-control" value="{{ item.quantity_in_stock }}" required>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-warning">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center py-4">No stock items found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+          {% endif %}
+          <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- 1. New Stock Modal (With Test Linking) -->
+<div class="modal fade" id="newStockModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Add New Item</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body row">
+          <input type="hidden" name="add_stock" value="1">
+          
+          <div class="col-md-6 mb-3">{{ stock_form.name.label_tag }} {{ stock_form.name }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.category.label_tag }} {{ stock_form.category }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.invoice.label_tag }} {{ stock_form.invoice }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.batch_number.label_tag }} {{ stock_form.batch_number }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.expiry_date.label_tag }} {{ stock_form.expiry_date }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.unit_price.label_tag }} {{ stock_form.unit_price }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.quantity_in_stock.label_tag }} {{ stock_form.quantity_in_stock }}</div>
+          <div class="col-md-6 mb-3">{{ stock_form.reorder_level.label_tag }} {{ stock_form.reorder_level }}</div>
+          
+          <!-- OPTIONAL LINK TO TESTS -->
+          <div class="col-12 mb-3">
+            <label class="form-label fw-bold text-primary">{{ stock_form.required_stock.label }}</label>
+            {{ stock_form.required_stock }}
+            <div class="form-text text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple tests. If linked, stock will deduct automatically when the test is ordered.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save New Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Restock Modal -->
+<div class="modal fade" id="restockModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Restock Existing Item</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="restock_stock" value="1">
+          <div class="mb-3"><label class="form-label">Select Item</label>{{ restock_form.item }}</div>
+          <div class="mb-3"><label class="form-label">Quantity Added</label>{{ restock_form.quantity_added }}</div>
+          <div class="mb-3"><label class="form-label">New Unit Price (UGX)</label>{{ restock_form.unit_price }}</div>
+          <div class="mb-3"><label class="form-label">Invoice (Optional)</label>{{ restock_form.invoice }}</div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add to Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Add Invoice</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="add_invoice" value="1">
+          {{ invoice_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Supplier Modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Add Supplier</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="add_supplier" value="1">
+          {{ supplier_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-dark">Save Supplier</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

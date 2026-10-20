@@ -30,9 +30,7 @@
         "name": "Serology",
         "description": "Antibodies and antigens"
     }
-}
-]
-[
+},
 {
     "model": "laboratory.labtest",
     "pk": 1,
@@ -210,9 +208,7 @@
         "is_active": true,
         "required_stock": []
     }
-}
-]
-[
+},
 {
     "model": "inventory.supplier",
     "pk": 1,
@@ -223,9 +219,7 @@
         "email": "abacus@info.com",
         "address": "Baita"
     }
-}
-]
-[
+},
 {
     "model": "inventory.invoice",
     "pk": 1,
@@ -234,9 +228,7 @@
         "supplier": 1,
         "date_received": "2026-10-20"
     }
-}
-]
-[
+},
 {
     "model": "inventory.stockitem",
     "pk": 1,
@@ -268,9 +260,7 @@
         "unit_price": "2000.00",
         "last_updated": "2026-10-20T10:38:44.783Z"
     }
-}
-]
-[
+},
 {
     "model": "patients.patient",
     "pk": 1,

@@ -94,11 +94,11 @@ WSGI_APPLICATION = 'zeiss_medical_diagnostic_laboratory.wsgi.application'
 # --------------------------------------------------------------------------
 # Database
 # --------------------------------------------------------------------------
-# If Render provides DATABASE_URL, use it (Supabase). 
+# If Render provides DATABASE_URL, use it (Supabase).
 # Otherwise, fall back to local SQLite for development.
 if 'DATABASE_URL' in os.environ:
     DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600)
+        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
     }
 else:
     DATABASES = {
@@ -123,6 +123,18 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
+
+# --------------------------------------------------------------------------
+# Session Security (Auto Logout)
+# --------------------------------------------------------------------------
+# Logs the user out when they close the browser tab/window
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True 
+
+# Sets the timeout to 30 minutes (1800 seconds)
+SESSION_COOKIE_AGE = 1800 
+
+# Resets the 30-minute timer every time the user clicks or loads a page
+SESSION_SAVE_EVERY_REQUEST = True 
 
 # --------------------------------------------------------------------------
 # Internationalization
